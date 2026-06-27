@@ -91,6 +91,14 @@
     color: #f7931e;
     text-decoration: underline;
   }
+  .visitor-count {
+    margin-top: 8px;
+    font-size: 11px;
+    color: #3a4260;
+  }
+  .visitor-count span {
+    color: #6b7490;
+  }
   .app-layout {
     display: flex;
     gap: 0;
@@ -501,8 +509,7 @@
   <strong>MONSTERKILL</strong> is a fan project and is not affiliated with Valve Corporation.
   Dota 2 and the Dota 2 logo are registered trademarks of Valve Corporation.
   All item names, icons, and game data are property of Valve Corporation.
-  <br>
-  <a href="https://github.com/fathahnoor/monsterkill" target="_blank" rel="noopener noreferrer">GitHub Repository</a>
+  <div class="visitor-count">👁️ <span id="visitorCount">—</span> visitors</div>
 </footer>
 <script>
 // ============================================================
@@ -2001,6 +2008,20 @@ document.addEventListener('DOMContentLoaded', () => {
       section.classList.contains("open") ? "\u25B9 Other Effects" : "\u25B8 Other Effects";
   });
 });
+// ---- VISITOR COUNTER ----
+(function() {
+  try {
+    const key = "monsterkill-visitors";
+    let count = parseInt(localStorage.getItem(key) || "0", 10) + 1;
+    localStorage.setItem(key, count);
+    document.getElementById("visitorCount").textContent = count.toLocaleString();
+  } catch(e) {
+    let count = 0;
+    document.getElementById("visitorCount").textContent = "? ";
+  }
+})();
+  }
+})();
 </script>
 
 </body>
