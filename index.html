@@ -502,8 +502,35 @@
   <strong>MONSTERKILL</strong> is a fan project and is not affiliated with Valve Corporation.
   Dota 2 and the Dota 2 logo are registered trademarks of Valve Corporation.
   All item names, icons, and game data are property of Valve Corporation.
-  <!-- Histats.com  (div with counter) --><div id="histats_counter"></div>
 </footer>
+
+<!-- Histats.com (div with counter) -->
+<div id="histats_wrapper" style="text-align:center;">
+  <div id="histats_counter"></div>
+</div>
+
+<!-- Histats.com START (async) -->
+<script type="text/javascript">
+var _Hasync = _Hasync || [];
+_Hasync.push(['Histats.start', '1,5035996,4,131,112,33,00011001']);
+_Hasync.push(['Histats.fasi', '1']);
+_Hasync.push(['Histats.track_hits', '']);
+(function() {
+  var hs = document.createElement('script'); hs.type = 'text/javascript'; hs.async = true;
+  hs.src = ('//s10.histats.com/js15_as.js');
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(hs);
+})();
+</script>
+<noscript>
+  <div style="text-align:center;">
+    <a href="/" target="_blank">
+      <img src="//sstatic1.histats.com/0.gif?5035996&101" alt="" border="0">
+    </a>
+  </div>
+</noscript>
+<!-- Histats.com END -->
+
+
 <script>
 // ============================================================
 // DATA — Complete Dota 2 Item Database (Patch 7.41d)
@@ -2002,18 +2029,5 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 </script>
-<!-- Histats.com  START  (aync)-->
-<script type="text/javascript">var _Hasync= _Hasync|| [];
-_Hasync.push(['Histats.start', '1,5035996,4,131,112,33,00011001']);
-_Hasync.push(['Histats.fasi', '1']);
-_Hasync.push(['Histats.track_hits', '']);
-(function() {
-var hs = document.createElement('script'); hs.type = 'text/javascript'; hs.async = true;
-hs.src = ('//s10.histats.com/js15_as.js');
-(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(hs);
-})();</script>
-<noscript><a href="/" target="_blank"><img  src="//sstatic1.histats.com/0.gif?5035996&101" alt="" border="0"></a></noscript>
-<!-- Histats.com  END  -->
-
 </body>
 </html>
