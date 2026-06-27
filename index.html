@@ -1,0 +1,1802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MONSTERKILL – Dota 2 Item Browser 7.41d</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: #0f1117;
+    color: #e4e6ed;
+    min-height: 100vh;
+  }
+  header {
+    background: linear-gradient(135deg, #1a1c25 0%, #232734 100%);
+    border-bottom: 1px solid #2a2e3f;
+    padding: 28px 32px 22px;
+    text-align: center;
+  }
+  header h1 {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    background: linear-gradient(90deg, #f7931e, #f5c542, #f7931e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
+  }
+  header .subtitle {
+    font-size: 14px;
+    color: #8892a8;
+    margin-top: 4px;
+  }
+  header .tagline {
+    font-size: 13px;
+    color: #5a6480;
+    margin-top: 2px;
+  }
+  .app-layout {
+    display: flex;
+    gap: 0;
+    max-width: 1600px;
+    margin: 0 auto;
+    min-height: calc(100vh - 110px);
+  }
+  /* ---- LEFT PANEL ---- */
+  .panel-left {
+    width: 320px;
+    min-width: 320px;
+    background: #151821;
+    border-right: 1px solid #2a2e3f;
+    padding: 20px 18px;
+    overflow-y: auto;
+    max-height: calc(100vh - 110px);
+    position: sticky;
+    top: 0;
+  }
+  .panel-left h3 {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #8d96b0;
+    margin-bottom: 12px;
+  }
+  .panel-left .section {
+    margin-bottom: 22px;
+  }
+  .panel-left label {
+    font-size: 13px;
+    color: #a8b0c8;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .panel-left input[type="text"],
+  .panel-left input[type="number"],
+  .panel-left select {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid #2e3348;
+    border-radius: 6px;
+    background: #1c1f2b;
+    color: #e4e6ed;
+    font-size: 13px;
+    outline: none;
+    transition: border 0.15s;
+  }
+  .panel-left input:focus, .panel-left select:focus { border-color: #f7931e; }
+  .panel-left select option { background: #1c1f2b; color: #e4e6ed; }
+  .cost-row { display: flex; gap: 8px; }
+  .cost-row input { width: 50%; }
+  .checkbox-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 6px;
+  }
+  .checkbox-grid label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: #bcc2d4;
+    cursor: pointer;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: #1c1f2b;
+    border: 1px solid #2e3348;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .checkbox-grid label:hover {
+    background: #262a3a;
+    border-color: #3e4560;
+  }
+  .checkbox-grid label.checked {
+    background: #2a2f4a;
+    border-color: #f7931e;
+    color: #f5c542;
+  }
+  .checkbox-grid input[type="checkbox"] { display: none; }
+  .count-badge {
+    font-size: 11px;
+    color: #6b7490;
+    margin-left: auto;
+    padding-left: 6px;
+  }
+  .results-count {
+    font-size: 12px;
+    color: #6b7490;
+    padding: 6px 0 2px;
+    border-top: 1px solid #232738;
+    margin-top: 6px;
+  }
+  .other-effects-toggle {
+    font-size: 12px;
+    color: #f7931e;
+    cursor: pointer;
+    margin-top: 6px;
+    user-select: none;
+  }
+  .other-effects-toggle:hover { color: #f5c542; }
+  .other-effects-section {
+    margin-top: 6px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.25s ease;
+  }
+  .other-effects-section.open { max-height: 600px; }
+
+  /* ---- RIGHT PANEL ---- */
+  .panel-right {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+    max-height: calc(100vh - 110px);
+  }
+  .item-list-section {
+    width: 50%;
+    min-width: 380px;
+    overflow-y: auto;
+    border-right: 1px solid #2a2e3f;
+  }
+  .item-list-header {
+    padding: 14px 16px 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #8d96b0;
+    border-bottom: 1px solid #232738;
+    position: sticky;
+    top: 0;
+    background: #0f1117;
+    z-index: 1;
+  }
+  .item-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    border-bottom: 1px solid #1e2130;
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+  .item-card:hover { background: #1a1d2b; }
+  .item-card.selected {
+    background: #232845;
+    border-left: 3px solid #f7931e;
+    padding-left: 13px;
+  }
+  .item-card .item-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    background: #1c1f2b;
+    border: 1px solid #2e3348;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .item-card .item-info { flex: 1; min-width: 0; }
+  .item-card .item-name {
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .item-card .item-cost {
+    font-size: 12px;
+    color: #f5c542;
+    font-weight: 500;
+  }
+  .item-card .item-tags-preview {
+    display: flex;
+    gap: 3px;
+    flex-wrap: wrap;
+    margin-top: 3px;
+  }
+  .item-card .tag-pill-mini {
+    font-size: 10px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    background: #1e2135;
+    color: #8892a8;
+    border: 1px solid #2a2e44;
+  }
+  .item-card .item-stats-preview {
+    font-size: 11px;
+    color: #6b7490;
+    margin-top: 2px;
+  }
+
+  /* ---- DETAIL PANEL ---- */
+  .detail-section {
+    width: 50%;
+    min-width: 340px;
+    overflow-y: auto;
+    padding: 24px;
+  }
+  .detail-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #5a6480;
+    font-size: 15px;
+    text-align: center;
+    padding: 40px;
+  }
+  .detail-empty span { opacity: 0.6; }
+  .detail-header {
+    margin-bottom: 20px;
+  }
+  .detail-header .detail-name {
+    font-size: 24px;
+    font-weight: 700;
+  }
+  .detail-header .detail-cost {
+    font-size: 16px;
+    color: #f5c542;
+    margin-top: 2px;
+  }
+  .detail-section-title {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #8d96b0;
+    margin-bottom: 10px;
+    margin-top: 18px;
+    border-bottom: 1px solid #232738;
+    padding-bottom: 6px;
+  }
+  .detail-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 16px;
+  }
+  .detail-stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    font-size: 13px;
+    border-bottom: 1px solid #1a1d2b;
+  }
+  .detail-stat-row .stat-label { color: #8892a8; }
+  .detail-stat-row .stat-value { color: #e4e6ed; font-weight: 500; }
+  .detail-stat-row .stat-value.positive { color: #4fc3a1; }
+  .detail-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 4px;
+  }
+  .tag-pill {
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    background: #1e2135;
+    color: #bcc2d4;
+    border: 1px solid #2e3348;
+  }
+  .detail-description {
+    font-size: 14px;
+    color: #a8b0c8;
+    line-height: 1.6;
+    margin-top: 12px;
+    padding: 12px;
+    background: #151821;
+    border-radius: 8px;
+    border: 1px solid #232738;
+  }
+  .no-results {
+    padding: 40px 20px;
+    text-align: center;
+    color: #5a6480;
+    font-size: 14px;
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #2e3348; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #3e4560; }
+
+  /* responsive */
+  @media (max-width: 900px) {
+    .panel-left {
+      width: 260px;
+      min-width: 260px;
+      padding: 14px;
+    }
+    .panel-right { flex-direction: column; }
+    .item-list-section, .detail-section { width: 100%; min-width: 0; }
+    .item-list-section { max-height: 50vh; border-right: none; border-bottom: 1px solid #2a2e3f; }
+    .detail-section { max-height: 50vh; }
+    .app-layout { min-height: auto; }
+    .panel-left, .panel-right { max-height: none; }
+  }
+  @media (max-width: 640px) {
+    .app-layout { flex-direction: column; }
+    .panel-left { width: 100%; min-width: 0; position: static; max-height: none; }
+    .panel-right { max-height: none; }
+    .item-list-section { max-height: 60vh; }
+    .detail-section { max-height: 60vh; }
+    header { padding: 20px 16px 16px; }
+    header h1 { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⚔ MONSTERKILL – Learn Smart, Win Hard</h1>
+  <div class="subtitle">Dota 2 Item Browser (Patch 7.41d)</div>
+  <div class="tagline">Search, filter, and sort all items by their effects and stats.</div>
+</header>
+
+<div class="app-layout">
+
+  <!-- LEFT PANEL: Controls -->
+  <aside class="panel-left">
+    <div class="section">
+      <label for="searchBox">🔍 Search Items</label>
+      <input type="text" id="searchBox" placeholder="Type item name..." autocomplete="off">
+    </div>
+
+    <div class="section">
+      <h3>Filter by Effect</h3>
+      <div class="checkbox-grid" id="mainEffects"></div>
+    </div>
+
+    <div class="section">
+      <div class="other-effects-toggle" id="otherToggle">▸ Other Effects (<span id="otherCount">0</span>)</div>
+      <div class="other-effects-section" id="otherSection">
+        <div class="checkbox-grid" id="otherEffects"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Cost Range</h3>
+      <div class="cost-row">
+        <input type="number" id="minCost" placeholder="Min" min="0">
+        <input type="number" id="maxCost" placeholder="Max" min="0">
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Sort By</h3>
+      <select id="sortBy">
+        <option value="name-asc">Name (A–Z)</option>
+        <option value="name-desc">Name (Z–A)</option>
+        <option value="cost-asc">Cost (Low → High)</option>
+        <option value="cost-desc">Cost (High → Low)</option>
+        <option value="mana-desc">Mana (High → Low)</option>
+        <option value="health-desc">Health (High → Low)</option>
+        <option value="damage-desc">Damage (High → Low)</option>
+        <option value="armor-desc">Armor (High → Low)</option>
+        <option value="attack_speed-desc">Attack Speed (High → Low)</option>
+        <option value="attack_range-desc">Attack Range (High → Low)</option>
+        <option value="move_speed-desc">Move Speed (High → Low)</option>
+        <option value="health_regen-desc">HP Regen (High → Low)</option>
+        <option value="mana_regen-desc">Mana Regen (High → Low)</option>
+        <option value="magic_resist-desc">Magic Resist (High → Low)</option>
+        <option value="spell_amp-desc">Spell Amp (High → Low)</option>
+        <option value="lifesteal-desc">Lifesteal (High → Low)</option>
+        <option value="status_resist-desc">Status Resist (High → Low)</option>
+        <option value="evasion-desc">Evasion (High → Low)</option>
+      </select>
+    </div>
+
+    <div class="results-count" id="resultsCount">Showing 0 items</div>
+  </aside>
+
+  <!-- RIGHT PANEL -->
+  <main class="panel-right">
+    <!-- Item List -->
+    <section class="item-list-section" id="itemListSection">
+      <div class="item-list-header">📦 Items</div>
+      <div id="itemList"></div>
+    </section>
+
+    <!-- Detail Panel -->
+    <section class="detail-section" id="detailSection">
+      <div class="detail-empty"><span>Click an item to see its details.</span></div>
+    </section>
+  </main>
+
+</div>
+
+<script>
+// ============================================================
+// DATA — Complete Dota 2 Item Database (Patch 7.41d)
+// ============================================================
+const items = [
+  // ---- CONSUMABLES ----
+  {
+    id: "observer_ward", name: "Observer Ward", cost: 0,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["vision", "support", "consumable"],
+    description: "Invisible unit that provides 1400 ground vision. Does not count towards the item slot limit. Limited to 1 per purchase."
+  },
+  {
+    id: "sentry_ward", name: "Sentry Ward", cost: 50,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["vision", "true_sight", "support", "consumable"],
+    description: "Invisible unit that reveals invisible enemies and wards in a 900 radius."
+  },
+  {
+    id: "blood_grenade", name: "Blood Grenade", cost: 50,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["slow", "damage_over_time", "consumable"],
+    description: "Thrown grenade that slows enemies by 15% and deals 20 damage over 5 seconds."
+  },
+  {
+    id: "clarity", name: "Clarity", cost: 50,
+    stats: { mana: 0, mana_regen: 6.0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["mana_regen", "consumable"],
+    description: "Grants 6 mana regeneration per second for 30 seconds. Dispelled upon taking damage."
+  },
+  {
+    id: "smoke_of_deceit", name: "Smoke of Deceit", cost: 50,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 20, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["invisibility", "move_speed", "consumable"],
+    description: "Grants invisibility and 20% movement speed to the hero and nearby allies. Breaks when near enemies."
+  },
+  {
+    id: "enchanted_mango", name: "Enchanted Mango", cost: 65,
+    stats: { mana: 0, mana_regen: 1.0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["mana_regen", "consumable"],
+    description: "Can be consumed instantly to restore 100 mana. Also passively grants +1 mana regen while in inventory."
+  },
+  {
+    id: "faerie_fire", name: "Faerie Fire", cost: 65,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 2, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["damage", "consumable"],
+    description: "Can be consumed instantly to restore 80 health. Also passively grants +2 damage while in inventory."
+  },
+  {
+    id: "dust_of_appearance", name: "Dust of Appearance", cost: 80,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["true_sight", "consumable"],
+    description: "Reveals and slows invisible units in a 1050 radius by 20% for 12 seconds."
+  },
+  {
+    id: "tango", name: "Tango", cost: 90,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 6.0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["health_regen", "consumable"],
+    description: "Consumes a tree to restore 120 health over 20 seconds. +6 HP regen while eaten."
+  },
+  {
+    id: "healing_salve", name: "Healing Salve", cost: 100,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 40.0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["health_regen", "consumable"],
+    description: "Restores 400 health over 10 seconds. Dispelled upon taking damage."
+  },
+  {
+    id: "town_portal_scroll", name: "Town Portal Scroll", cost: 100,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["teleport", "consumable"],
+    description: "Teleports your hero to a friendly building after 3 seconds of channeling."
+  },
+  {
+    id: "bottle", name: "Bottle", cost: 675,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["consumable", "sustain"],
+    description: "Stores runes. Regenerates 80 health and 40 mana per charge over 3 seconds. 3 charges."
+  },
+  {
+    id: "aghanims_shard", name: "Aghanim's Shard", cost: 1400,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["ability_upgrade", "consumable"],
+    description: "Upgrades a hero ability, granting a new or improved effect. Consumed on use."
+  },
+
+  // ---- ATTRIBUTES ----
+  {
+    id: "iron_branch", name: "Iron Branch", cost: 50,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 1, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["attributes", "damage", "versatile"],
+    description: "Affordable stat item. Can be planted as a tree or consumed for +1 to all attributes."
+  },
+  {
+    id: "gauntlets_of_strength", name: "Gauntlets of Strength", cost: 140,
+    stats: { mana: 0, mana_regen: 0, health: 60, health_regen: 0.3, armor: 0, magic_resist: 0, damage: 3, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["strength", "health", "damage"],
+    description: "Provides +3 Strength (+60 HP, +0.3 HP regen, +3 damage)."
+  },
+  {
+    id: "mantle_of_intelligence", name: "Mantle of Intelligence", cost: 140,
+    stats: { mana: 36, mana_regen: 0.3, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 3, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["intelligence", "mana", "damage"],
+    description: "Provides +3 Intelligence (+36 mana, +0.3 mana regen, +3 damage)."
+  },
+  {
+    id: "slippers_of_agility", name: "Slippers of Agility", cost: 140,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0.5, magic_resist: 0, damage: 3, attack_speed: 3, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["agility", "armor", "attack_speed", "damage"],
+    description: "Provides +3 Agility (+3 attack speed, +0.5 armor, +3 damage)."
+  },
+  {
+    id: "circlet", name: "Circlet", cost: 155,
+    stats: { mana: 24, mana_regen: 0.2, health: 40, health_regen: 0.2, armor: 0.33, magic_resist: 0, damage: 2, attack_speed: 2, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["attributes", "versatile"],
+    description: "Provides +2 to all attributes (+40 HP, +24 mana, +2 damage, +2 attack speed, +0.33 armor)."
+  },
+  {
+    id: "band_of_elvenskin", name: "Band of Elvenskin", cost: 450,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 1.0, magic_resist: 0, damage: 6, attack_speed: 6, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["agility", "attack_speed", "armor", "damage"],
+    description: "Provides +6 Agility (+6 attack speed, +1 armor, +6 damage)."
+  },
+  {
+    id: "belt_of_strength", name: "Belt of Strength", cost: 450,
+    stats: { mana: 0, mana_regen: 0, health: 120, health_regen: 0.6, armor: 0, magic_resist: 0, damage: 6, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["strength", "health", "damage"],
+    description: "Provides +6 Strength (+120 HP, +0.6 HP regen, +6 damage)."
+  },
+  {
+    id: "crown", name: "Crown", cost: 450,
+    stats: { mana: 48, mana_regen: 0.4, health: 80, health_regen: 0.4, armor: 0.67, magic_resist: 0, damage: 4, attack_speed: 4, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["attributes", "versatile"],
+    description: "Provides +4 to all attributes (+80 HP, +48 mana, +4 damage, +4 attack speed, +0.67 armor)."
+  },
+  {
+    id: "robe_of_the_magi", name: "Robe of the Magi", cost: 450,
+    stats: { mana: 72, mana_regen: 0.6, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 6, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["intelligence", "mana", "damage"],
+    description: "Provides +6 Intelligence (+72 mana, +0.6 mana regen, +6 damage)."
+  },
+  {
+    id: "blade_of_alacrity", name: "Blade of Alacrity", cost: 1000,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 1.67, magic_resist: 0, damage: 10, attack_speed: 10, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["agility", "attack_speed", "armor", "damage"],
+    description: "Provides +10 Agility (+10 attack speed, +1.67 armor, +10 damage)."
+  },
+  {
+    id: "diadem", name: "Diadem", cost: 1000,
+    stats: { mana: 48, mana_regen: 0.4, health: 80, health_regen: 0.4, armor: 0.67, magic_resist: 0, damage: 4, attack_speed: 4, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["attributes", "versatile"],
+    description: "Provides +4 to all attributes (+80 HP, +48 mana, +4 damage, +4 attack speed, +0.67 armor)."
+  },
+  {
+    id: "ogre_axe", name: "Ogre Axe", cost: 1000,
+    stats: { mana: 0, mana_regen: 0, health: 200, health_regen: 1.0, armor: 0, magic_resist: 0, damage: 10, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["strength", "health", "damage"],
+    description: "Provides +10 Strength (+200 HP, +1 HP regen, +10 damage)."
+  },
+  {
+    id: "staff_of_wizardry", name: "Staff of Wizardry", cost: 1000,
+    stats: { mana: 120, mana_regen: 1.0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 10, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["intelligence", "mana", "damage"],
+    description: "Provides +10 Intelligence (+120 mana, +1 mana regen, +10 damage, +4% spell amp)."
+  },
+
+  // ---- EQUIPMENT ----
+  {
+    id: "quelling_blade", name: "Quelling Blade", cost: 100,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 12, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["damage", "farming", "melee"],
+    description: "Increases attack damage against creeps and heroes. Melee: +24/8, Ranged: +12/4 damage vs creeps/heroes."
+  },
+  {
+    id: "ring_of_protection", name: "Ring of Protection", cost: 175,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 2, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["armor", "support"],
+    description: "Provides +2 armor."
+  },
+  {
+    id: "infused_raindrops", name: "Infused Raindrops", cost: 225,
+    stats: { mana: 0, mana_regen: 0.5, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["mana_regen", "magic_block", "consumable"],
+    description: "Passively blocks 120 magic damage from incoming spells. Has 5 charges. +0.5 mana regen."
+  },
+  {
+    id: "orb_of_venom", name: "Orb of Venom", cost: 250,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 3, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["slow", "damage_over_time", "poison"],
+    description: "Attacks poison enemies, slowing by 12% (melee) / 6% (ranged) and dealing 3 DPS for 4 seconds."
+  },
+  {
+    id: "blight_stone", name: "Blight Stone", cost: 300,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["armor_reduction", "physical"],
+    description: "Attacks reduce enemy armor by 2 for 8 seconds."
+  },
+  {
+    id: "blades_of_attack", name: "Blades of Attack", cost: 450,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 9, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["damage"],
+    description: "Provides +9 attack damage."
+  },
+  {
+    id: "gloves_of_haste", name: "Gloves of Haste", cost: 450,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 15, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["attack_speed"],
+    description: "Provides +15 attack speed."
+  },
+  {
+    id: "chainmail", name: "Chainmail", cost: 550,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 5, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["armor"],
+    description: "Provides +5 armor."
+  },
+  {
+    id: "javelin", name: "Javelin", cost: 900,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 24, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["damage", "pierce", "proc"],
+    description: "Provides +24 damage. Attacks have a 20% chance to deal 100 bonus pure damage."
+  },
+  {
+    id: "helm_of_iron_will", name: "Helm of Iron Will", cost: 975,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 3.0, armor: 5, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["armor", "health_regen"],
+    description: "Provides +5 armor and +3 HP regen."
+  },
+  {
+    id: "blitz_knuckles", name: "Blitz Knuckles", cost: 1000,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 35, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["attack_speed"],
+    description: "Provides +35 attack speed."
+  },
+  {
+    id: "broadsword", name: "Broadsword", cost: 1000,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 15, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["damage"],
+    description: "Provides +15 attack damage."
+  },
+  {
+    id: "claymore", name: "Claymore", cost: 1350,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 20, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["damage"],
+    description: "Provides +20 attack damage."
+  },
+  {
+    id: "mithril_hammer", name: "Mithril Hammer", cost: 1600,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 24, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["damage"],
+    description: "Provides +24 attack damage."
+  },
+
+  // ---- MISC ----
+  {
+    id: "ring_of_regen", name: "Ring of Regen", cost: 175,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 1.5, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["health_regen", "sustain"],
+    description: "Provides +1.5 HP regen."
+  },
+  {
+    id: "sages_mask", name: "Sage's Mask", cost: 175,
+    stats: { mana: 0, mana_regen: 1.75, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["mana_regen"],
+    description: "Provides +1.75 mana regen."
+  },
+  {
+    id: "fluffy_hat", name: "Fluffy Hat", cost: 250,
+    stats: { mana: 0, mana_regen: 0, health: 125, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["health", "support"],
+    description: "Provides +125 health."
+  },
+  {
+    id: "wind_lace", name: "Wind Lace", cost: 250,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 20, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["move_speed", "support"],
+    description: "Provides +20 movement speed."
+  },
+  {
+    id: "magic_stick", name: "Magic Stick", cost: 322,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["sustain", "versatile"],
+    description: "Stores charges when enemies cast spells nearby. Activate to restore HP and mana per charge (max 10 charges)."
+  },
+  {
+    id: "boots_of_speed", name: "Boots of Speed", cost: 500,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 45, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["move_speed", "boots"],
+    description: "Provides +45 movement speed."
+  },
+  {
+    id: "ring_of_health", name: "Ring of Health", cost: 700,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 4.5, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["health_regen", "sustain"],
+    description: "Provides +4.5 HP regen."
+  },
+  {
+    id: "voodoo_mask", name: "Voodoo Mask", cost: 700,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 12, status_resist: 0, evasion: 0 },
+    tags: ["spell_lifesteal", "caster"],
+    description: "Provides +12% spell lifesteal."
+  },
+  {
+    id: "cloak", name: "Cloak", cost: 800,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 20, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["magic_resist", "defense"],
+    description: "Provides +20% magic resistance."
+  },
+  {
+    id: "gem_of_true_sight", name: "Gem of True Sight", cost: 900,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["true_sight", "vision"],
+    description: "Reveals invisible enemies and wards in a 900 radius. Drops on death."
+  },
+  {
+    id: "morbid_mask", name: "Morbid Mask", cost: 900,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 15, status_resist: 0, evasion: 0 },
+    tags: ["lifesteal", "physical"],
+    description: "Provides +15% lifesteal."
+  },
+  {
+    id: "shadow_amulet", name: "Shadow Amulet", cost: 1000,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 20, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["magic_resist", "invisibility", "defense"],
+    description: "Provides +20% magic resistance. Activate to turn invisible while standing still."
+  },
+  {
+    id: "ghost_scepter", name: "Ghost Scepter", cost: 1500,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["ethereal", "magic_defense", "defense"],
+    description: "Activate to become ethereal — immune to physical damage but take 40% increased magic damage. Also slows enemies."
+  },
+  {
+    id: "ring_of_tarrasque", name: "Ring of Tarrasque", cost: 1800,
+    stats: { mana: 0, mana_regen: 0, health: 250, health_regen: 5.0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["health", "health_regen", "sustain"],
+    description: "Provides +250 health and +5 HP regen."
+  },
+  {
+    id: "tiara_of_selemene", name: "Tiara of Selemene", cost: 1800,
+    stats: { mana: 200, mana_regen: 2.4, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["mana", "mana_regen", "caster"],
+    description: "Provides +200 mana and +2.4 mana regen."
+  },
+  {
+    id: "blink_dagger", name: "Blink Dagger", cost: 2250,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["blink", "mobility", "positioning"],
+    description: "Activate to teleport up to 1200 units. 3-second cooldown if damage taken recently."
+  },
+
+  // ---- SECRET SHOP ----
+  {
+    id: "energy_booster", name: "Energy Booster", cost: 800,
+    stats: { mana: 250, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["mana", "caster"],
+    description: "Provides +250 mana."
+  },
+  {
+    id: "vitality_booster", name: "Vitality Booster", cost: 1000,
+    stats: { mana: 0, mana_regen: 0, health: 250, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["health", "tank"],
+    description: "Provides +250 health."
+  },
+  {
+    id: "cornucopia", name: "Cornucopia", cost: 1200,
+    stats: { mana: 0, mana_regen: 1.6, health: 0, health_regen: 1.75, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["health_regen", "mana_regen", "sustain"],
+    description: "Provides +1.75 HP regen and +1.6 mana regen."
+  },
+  {
+    id: "point_booster", name: "Point Booster", cost: 1200,
+    stats: { mana: 200, mana_regen: 0, health: 200, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["mana", "health", "versatile"],
+    description: "Provides +200 mana and +200 health."
+  },
+  {
+    id: "talisman_of_evasion", name: "Talisman of Evasion", cost: 1300,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 20 },
+    tags: ["evasion", "defense"],
+    description: "Provides +20% evasion."
+  },
+  {
+    id: "platemail", name: "Platemail", cost: 1400,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 10, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["armor", "defense"],
+    description: "Provides +10 armor."
+  },
+  {
+    id: "hyperstone", name: "Hyperstone", cost: 2000,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 55, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["attack_speed"],
+    description: "Provides +55 attack speed."
+  },
+  {
+    id: "demon_edge", name: "Demon Edge", cost: 2200,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 36, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["damage"],
+    description: "Provides +36 attack damage."
+  },
+  {
+    id: "eaglesong", name: "Eaglesong", cost: 2800,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 4.17, magic_resist: 0, damage: 25, attack_speed: 25, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["agility", "attack_speed", "armor", "damage"],
+    description: "Provides +25 Agility (+25 attack speed, +4.17 armor, +25 damage)."
+  },
+  {
+    id: "mystic_staff", name: "Mystic Staff", cost: 2800,
+    stats: { mana: 300, mana_regen: 2.5, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 25, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["intelligence", "mana", "damage"],
+    description: "Provides +25 Intelligence (+300 mana, +2.5 mana regen, +25 damage, +10% spell amp)."
+  },
+  {
+    id: "reaver", name: "Reaver", cost: 2800,
+    stats: { mana: 0, mana_regen: 0, health: 500, health_regen: 2.5, armor: 0, magic_resist: 0, damage: 25, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["strength", "health", "damage"],
+    description: "Provides +25 Strength (+500 HP, +2.5 HP regen, +25 damage)."
+  },
+  {
+    id: "ultimate_orb", name: "Ultimate Orb", cost: 2800,
+    stats: { mana: 120, mana_regen: 1.0, health: 200, health_regen: 1.0, armor: 1.67, magic_resist: 0, damage: 10, attack_speed: 10, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["attributes", "versatile"],
+    description: "Provides +10 to all attributes (+200 HP, +120 mana, +10 damage, +10 attack speed, +1.67 armor)."
+  },
+  {
+    id: "sacred_relic", name: "Sacred Relic", cost: 3400,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 55, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["damage"],
+    description: "Provides +55 attack damage."
+  },
+
+  // ---- ACCESSORIES ----
+  {
+    id: "bracer", name: "Bracer", cost: 505,
+    stats: { mana: 0, mana_regen: 0, health: 90, health_regen: 0.3, armor: 0.5, magic_resist: 0, damage: 3, attack_speed: 3, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["strength", "agility", "health", "damage"],
+    description: "Provides +3 Strength and +3 Agility (+90 HP, +3 damage, +3 attack speed, +0.5 armor)."
+  },
+  {
+    id: "null_talisman", name: "Null Talisman", cost: 505,
+    stats: { mana: 36, mana_regen: 0.3, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 3, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["intelligence", "mana", "damage", "caster"],
+    description: "Provides +3 Intelligence, +3 damage, +3% spell amp, and +90 mana."
+  },
+  {
+    id: "wraith_band", name: "Wraith Band", cost: 505,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 1.5, magic_resist: 0, damage: 3, attack_speed: 3, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["agility", "armor", "attack_speed", "damage"],
+    description: "Provides +3 Agility, +3 damage, +3 attack speed, and +1.5 armor."
+  },
+  {
+    id: "magic_wand", name: "Magic Wand", cost: 572,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 1, attack_speed: 1, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["attributes", "sustain"],
+    description: "Stores charges from nearby spell casts. Activate to restore 15 HP and mana per charge. +1 to all attributes."
+  },
+  {
+    id: "soul_ring", name: "Soul Ring", cost: 805,
+    stats: { mana: 0, mana_regen: 1.5, health: 0, health_regen: 3.0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["health_regen", "mana_regen", "sustain"],
+    description: "Activate to sacrifice 170 HP and gain 150 mana for 10 seconds. +3 HP regen, +1.5 mana regen."
+  },
+  {
+    id: "orb_of_corrosion", name: "Orb of Corrosion", cost: 900,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 1, magic_resist: 0, damage: 3, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["slow", "armor_reduction", "damage", "armor"],
+    description: "Attacks slow enemies by 12%/6% (melee/ranged) and reduce armor by 2. +3 damage, +1 armor."
+  },
+  {
+    id: "falcon_blade", name: "Falcon Blade", cost: 1125,
+    stats: { mana: 0, mana_regen: 1.75, health: 150, health_regen: 0, armor: 0, magic_resist: 0, damage: 8, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["damage", "health", "mana_regen", "farming"],
+    description: "Provides +8 damage, +150 health, and +1.75 mana regen."
+  },
+  {
+    id: "perseverance", name: "Perseverance", cost: 1400,
+    stats: { mana: 0, mana_regen: 2.0, health: 0, health_regen: 2.5, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["health_regen", "mana_regen", "sustain"],
+    description: "Provides +2.5 HP regen and +2 mana regen."
+  },
+  {
+    id: "power_treads", name: "Power Treads", cost: 1400,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 10, attack_speed: 25, attack_range: 0, move_speed: 45, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["attack_speed", "move_speed", "attributes", "boots"],
+    description: "Switchable attribute bonus (+10 str/agi/int). +45 move speed, +25 attack speed, +10 damage from selected attribute."
+  },
+  {
+    id: "phase_boots", name: "Phase Boots", cost: 1500,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 3, magic_resist: 0, damage: 20, attack_speed: 0, attack_range: 0, move_speed: 45, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["damage", "move_speed", "armor", "boots"],
+    description: "Provides +45 move speed, +20 damage, +3 armor. Phase active grants unit walking and +20% move speed."
+  },
+  {
+    id: "oblivion_staff", name: "Oblivion Staff", cost: 1625,
+    stats: { mana: 0, mana_regen: 1.25, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 15, attack_speed: 15, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["damage", "attack_speed", "mana_regen"],
+    description: "Provides +15 damage, +15 attack speed, and +1.25 mana regen."
+  },
+  {
+    id: "mask_of_madness", name: "Mask of Madness", cost: 1900,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 20, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 15, status_resist: 0, evasion: 0 },
+    tags: ["lifesteal", "damage", "attack_speed"],
+    description: "Active: Berserk — +60 attack speed, +30% move speed, +30% incoming damage for 6 seconds. +20 damage, +15% lifesteal."
+  },
+  {
+    id: "hand_of_midas", name: "Hand of Midas", cost: 2200,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 30, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["attack_speed", "farming", "gold"],
+    description: "Active: Transmute a creep into 160 gold. +30 attack speed."
+  },
+  {
+    id: "boots_of_travel", name: "Boots of Travel", cost: 2500,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 90, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["move_speed", "teleport", "boots"],
+    description: "Provides +90 move speed. Active: Teleport to a friendly non-hero unit or building."
+  },
+  {
+    id: "helm_of_the_dominator", name: "Helm of the Dominator", cost: 2625,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 6.0, armor: 6, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["armor", "health_regen", "summon", "dominate"],
+    description: "Provides +6 armor, +6 HP regen. Active: Dominate a neutral creep to fight for you."
+  },
+  {
+    id: "moon_shard", name: "Moon Shard", cost: 4000,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 65, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["attack_speed", "night_vision"],
+    description: "Provides +65 attack speed. Can be consumed to permanently grant +60 attack speed and +200 night vision."
+  },
+  {
+    id: "helm_of_the_overlord", name: "Helm of the Overlord", cost: 5725,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 8.0, armor: 8, magic_resist: 0, damage: 6, attack_speed: 6, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["armor", "health_regen", "attributes", "summon", "dominate"],
+    description: "Provides +8 armor, +8 HP regen, +6 all attributes. Active: Dominate an ancient creep to fight for you."
+  },
+
+  // ---- SUPPORT ----
+  {
+    id: "buckler", name: "Buckler", cost: 425,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 1.5, armor: 2, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["armor", "health_regen", "support"],
+    description: "Provides +2 armor and +1.5 HP regen. Active: Grants +2 armor to nearby allies."
+  },
+  {
+    id: "headdress", name: "Headdress", cost: 425,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 1.5, armor: 0, magic_resist: 0, damage: 2, attack_speed: 2, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["health_regen", "attributes", "support"],
+    description: "Provides +1.5 HP regen and +2 all attributes. Aura: +2 HP regen to nearby allies."
+  },
+  {
+    id: "ring_of_basilius", name: "Ring of Basilius", cost: 425,
+    stats: { mana: 0, mana_regen: 1.75, health: 0, health_regen: 0, armor: 1, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["mana_regen", "armor", "support"],
+    description: "Provides +1.75 mana regen and +1 armor. Aura: +0.65 mana regen to nearby allies. Toggle to amp/mute."
+  },
+  {
+    id: "urn_of_shadows", name: "Urn of Shadows", cost: 880,
+    stats: { mana: 0, mana_regen: 2.0, health: 0, health_regen: 0, armor: 2, magic_resist: 0, damage: 3, attack_speed: 2, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["mana_regen", "attributes", "damage_over_time", "sustain", "support"],
+    description: "Active: Deal 30 DPS for 8 seconds (enemy) or heal 30 HP for 8 seconds (ally). +2 all attributes, +2 mana regen."
+  },
+  {
+    id: "tranquil_boots", name: "Tranquil Boots", cost: 925,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 14.0, armor: 3, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 40, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["health_regen", "move_speed", "armor", "boots"],
+    description: "Provides +40 move speed, +14 HP regen, +3 armor. Active: Heal 200 HP. Breaks on hero damage."
+  },
+  {
+    id: "arcane_boots", name: "Arcane Boots", cost: 1300,
+    stats: { mana: 250, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 45, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["mana", "move_speed", "boots"],
+    description: "Provides +45 move speed and +250 mana. Active: Restore 160 mana to nearby allies."
+  },
+  {
+    id: "pavise", name: "Pavise", cost: 1400,
+    stats: { mana: 0, mana_regen: 1.75, health: 125, health_regen: 0, armor: 2, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["armor", "mana_regen", "health", "support"],
+    description: "Active: Grant an ally a barrier that blocks 200 physical damage. +125 health, +2 armor, +1.75 mana regen."
+  },
+  {
+    id: "drum_of_endurance", name: "Drum of Endurance", cost: 1650,
+    stats: { mana: 0, mana_regen: 0.8, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 3, attack_speed: 23, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["attack_speed", "mana_regen", "attributes", "support"],
+    description: "Provides +3 all attributes, +20 attack speed, +0.8 mana regen. Active: +35 attack speed and +15% move speed to nearby allies."
+  },
+  {
+    id: "mekansm", name: "Mekansm", cost: 1775,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 2.5, armor: 4, magic_resist: 0, damage: 2, attack_speed: 2, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["armor", "health_regen", "attributes", "support"],
+    description: "Provides +4 armor, +2.5 HP regen, +2 all attributes. Active: Heal 275 HP to nearby allies."
+  },
+  {
+    id: "vladmirs_offering", name: "Vladmir's Offering", cost: 2200,
+    stats: { mana: 0, mana_regen: 1.5, health: 0, health_regen: 0, armor: 2, magic_resist: 0, damage: 3, attack_speed: 2, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 18, status_resist: 0, evasion: 0 },
+    tags: ["lifesteal", "mana_regen", "armor", "attributes", "aura", "support"],
+    description: "Aura: +18% lifesteal, +15% damage, +2 armor, +1.25 mana regen. +2 all attributes, +1.5 mana regen to carrier."
+  },
+  {
+    id: "holy_locket", name: "Holy Locket", cost: 2350,
+    stats: { mana: 0, mana_regen: 2.5, health: 200, health_regen: 0, armor: 0, magic_resist: 0, damage: 3, attack_speed: 3, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["mana_regen", "health", "attributes", "heal_amp", "support"],
+    description: "Provides +200 health, +2.5 mana regen, +3 all attributes. Passive: +20% heal and amplify."
+  },
+  {
+    id: "spirit_vessel", name: "Spirit Vessel", cost: 2780,
+    stats: { mana: 0, mana_regen: 2.0, health: 200, health_regen: 2.0, armor: 2, magic_resist: 0, damage: 3, attack_speed: 2, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["mana_regen", "health", "health_regen", "damage_over_time", "sustain", "support"],
+    description: "Active: Deal 40 DPS + 5% max HP per second (enemy) or heal 30 HP + 3% max HP (ally). +200 health, +2 HP regen, +2 mana regen."
+  },
+  {
+    id: "pipe_of_insight", name: "Pipe of Insight", cost: 3725,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 8.0, armor: 0, magic_resist: 0, damage: 7, attack_speed: 7, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["health_regen", "attributes", "magic_barrier", "support"],
+    description: "Provides +8 HP regen, +7 all attributes. Active: Grant a 400 magic damage barrier to nearby allies."
+  },
+  {
+    id: "boots_of_bearing", name: "Boots of Bearing", cost: 4275,
+    stats: { mana: 0, mana_regen: 1.2, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 3, attack_speed: 33, attack_range: 0, move_speed: 55, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["move_speed", "attack_speed", "mana_regen", "attributes", "boots"],
+    description: "Provides +55 move speed, +30 attack speed, +1.2 mana regen, +3 all attributes. Active: +35 attack speed and +15% move speed."
+  },
+  {
+    id: "guardian_greaves", name: "Guardian Greaves", cost: 4950,
+    stats: { mana: 0, mana_regen: 2.5, health: 0, health_regen: 0, armor: 5, magic_resist: 0, damage: 5, attack_speed: 5, attack_range: 0, move_speed: 55, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["armor", "mana_regen", "move_speed", "attributes", "boots", "support"],
+    description: "Provides +55 move speed, +5 armor, +2.5 mana regen, +5 all attributes. Active: Heal 350 HP and restore 120 mana to nearby allies."
+  },
+  {
+    id: "parasma", name: "Parasma", cost: 5975,
+    stats: { mana: 0, mana_regen: 0.8, health: 0, health_regen: 0, armor: 0, magic_resist: 30, damage: 0, attack_speed: 50, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["intelligence", "attack_speed", "magic_resist", "mana_regen"],
+    description: "Provides +25 Intelligence, +50 attack speed, +0.8 mana regen, +30% magic resistance. Passive: Magical attacks deal bonus magic damage."
+  },
+
+  // ---- MAGICAL ----
+  {
+    id: "veil_of_discord", name: "Veil of Discord", cost: 1725,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 2.5, armor: 5, magic_resist: 0, damage: 6, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["armor", "health_regen", "intelligence", "magic_weakness"],
+    description: "Provides +6 Intelligence, +5 armor, +2.5 HP regen. Active: Reduce enemy magic resistance by 18% in an AoE."
+  },
+  {
+    id: "glimmer_cape", name: "Glimmer Cape", cost: 2150,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 6.0, armor: 0, magic_resist: 25, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["magic_resist", "health_regen", "invisibility", "support"],
+    description: "Provides +25% magic resistance, +6 HP regen. Active: Grant invisibility and +30% magic resistance to target."
+  },
+  {
+    id: "force_staff", name: "Force Staff", cost: 2200,
+    stats: { mana: 0, mana_regen: 1.5, health: 0, health_regen: 5.0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["intelligence", "mana_regen", "health_regen", "mobility"],
+    description: "Provides +10 Intelligence, +5 HP regen, +1.5 mana regen. Active: Push a target 600 units in the direction they face."
+  },
+  {
+    id: "rod_of_atos", name: "Rod of Atos", cost: 2250,
+    stats: { mana: 0, mana_regen: 2.5, health: 350, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["intelligence", "mana_regen", "health", "slow"],
+    description: "Provides +15 Intelligence, +350 health, +2.5 mana regen. Active: Root an enemy for 2 seconds."
+  },
+  {
+    id: "aether_lens", name: "Aether Lens", cost: 2275,
+    stats: { mana: 300, mana_regen: 2.5, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 225, move_speed: 0, spell_amp: 5, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["mana", "mana_regen", "attack_range", "caster", "support", "spell_amp"],
+    description: "Increases cast range by 225 and mana pool for spellcasters. +300 mana, +2.5 mana regen, +5% spell amp."
+  },
+  {
+    id: "euls_scepter", name: "Eul's Scepter of Divinity", cost: 2625,
+    stats: { mana: 0, mana_regen: 5.0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 10, attack_speed: 0, attack_range: 0, move_speed: 20, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["intelligence", "mana_regen", "move_speed", "dispel", "cyclone"],
+    description: "Provides +10 Intelligence, +5 mana regen, +20 move speed. Active: Cyclone a unit, making it invulnerable for 2.5 seconds."
+  },
+  {
+    id: "solar_crest", name: "Solar Crest", cost: 2700,
+    stats: { mana: 0, mana_regen: 1.75, health: 0, health_regen: 0, armor: 10, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 20 },
+    tags: ["armor", "evasion", "mana_regen", "support"],
+    description: "Provides +10 armor, +20% evasion, +1.75 mana regen. Active: Buff target ally or debuff enemy."
+  },
+  {
+    id: "witch_blade", name: "Witch Blade", cost: 2775,
+    stats: { mana: 0, mana_regen: 0.8, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 30, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["intelligence", "attack_speed", "mana_regen"],
+    description: "Provides +25 Intelligence, +30 attack speed, +0.8 mana regen. Passive: Attacks deal bonus magic damage."
+  },
+  {
+    id: "dagon", name: "Dagon", cost: 2850,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 13, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 6, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["intelligence", "damage", "spell_amp", "burst", "caster"],
+    description: "Provides +13 Intelligence, +6% spell amp. Active: Deal 400 magic damage (level 1). Upgradable (5 levels)."
+  },
+  {
+    id: "orchid_malevolence", name: "Orchid Malevolence", cost: 3275,
+    stats: { mana: 0, mana_regen: 3.5, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 30, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["intelligence", "attack_speed", "mana_regen", "silence", "caster"],
+    description: "Provides +25 Intelligence, +30 attack speed, +3.5 mana regen. Active: Silence and amplify damage taken by 30%."
+  },
+  {
+    id: "aghanims_scepter", name: "Aghanim's Scepter", cost: 4200,
+    stats: { mana: 175, mana_regen: 0, health: 175, health_regen: 0, armor: 0, magic_resist: 0, damage: 10, attack_speed: 10, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["attributes", "health", "mana", "ability_upgrade"],
+    description: "Provides +10 all attributes, +175 health, +175 mana. Upgrades your hero's ultimate ability."
+  },
+  {
+    id: "octarine_core", name: "Octarine Core", cost: 4800,
+    stats: { mana: 550, mana_regen: 6.0, health: 0, health_regen: 2.5, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["intelligence", "mana", "mana_regen", "health_regen", "cooldown_reduction", "caster"],
+    description: "Provides +25 Intelligence, +550 mana, +6 mana regen, +2.5 HP regen. Passive: +20% cooldown reduction."
+  },
+  {
+    id: "refresher_orb", name: "Refresher Orb", cost: 5000,
+    stats: { mana: 0, mana_regen: 6.0, health: 0, health_regen: 8.0, armor: 0, magic_resist: 0, damage: 30, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["mana_regen", "health_regen", "damage", "reset"],
+    description: "Provides +30 damage, +8 HP regen, +6 mana regen. Active: Reset all abilities and item cooldowns."
+  },
+  {
+    id: "scythe_of_vyse", name: "Scythe of Vyse", cost: 5200,
+    stats: { mana: 0, mana_regen: 8.0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 35, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["intelligence", "mana_regen", "damage", "hex", "disable"],
+    description: "Provides +30 Intelligence, +8 mana regen, +35 damage. Active: Hex a unit, disabling them for 3.5 seconds."
+  },
+  {
+    id: "gleipnir", name: "Gleipnir", cost: 5450,
+    stats: { mana: 0, mana_regen: 2.5, health: 500, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["intelligence", "mana_regen", "health", "root", "disable", "caster"],
+    description: "Provides +25 Intelligence, +500 health, +2.5 mana regen. Active: AoE root for 2 seconds."
+  },
+  {
+    id: "aghanims_blessing", name: "Aghanim's Blessing", cost: 5800,
+    stats: { mana: 175, mana_regen: 0, health: 175, health_regen: 0, armor: 0, magic_resist: 0, damage: 10, attack_speed: 10, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["attributes", "health", "mana", "ability_upgrade", "consumable"],
+    description: "Consumed to upgrade a hero's ultimate. +10 all attributes, +175 health, +175 mana."
+  },
+  {
+    id: "wind_waker", name: "Wind Waker", cost: 6825,
+    stats: { mana: 0, mana_regen: 8.0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 50, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["intelligence", "mana_regen", "move_speed", "cyclone", "dispel"],
+    description: "Provides +15 Intelligence, +8 mana regen, +50 move speed. Active: Cyclone self (invulnerable, 2.5 sec, dispels)."
+  },
+
+  // ---- ARMOR ----
+  {
+    id: "vanguard", name: "Vanguard", cost: 1700,
+    stats: { mana: 0, mana_regen: 0, health: 250, health_regen: 4.5, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["health", "health_regen", "damage_block", "tank"],
+    description: "Provides +250 health, +4.5 HP regen. Passive: Blocks damage from attacks (melee: 64, ranged: 32)."
+  },
+  {
+    id: "blade_mail", name: "Blade Mail", cost: 2100,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 6, magic_resist: 0, damage: 20, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["armor", "damage", "reflection"],
+    description: "Provides +6 armor, +20 damage. Active: Reflect 100% of incoming damage back to the attacker for 4.5 seconds."
+  },
+  {
+    id: "aeon_disk", name: "Aeon Disk", cost: 3000,
+    stats: { mana: 250, mana_regen: 0, health: 250, health_regen: 2.5, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["health", "mana", "health_regen", "save", "defense"],
+    description: "Provides +250 health, +250 mana, +2.5 HP regen. Passive: When taking damage below 70% HP, creates a 75% damage barrier."
+  },
+  {
+    id: "soul_booster", name: "Soul Booster", cost: 3000,
+    stats: { mana: 400, mana_regen: 2.0, health: 450, health_regen: 2.5, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["health", "mana", "health_regen", "mana_regen", "caster"],
+    description: "Provides +450 health, +400 mana, +2.5 HP regen, +2 mana regen."
+  },
+  {
+    id: "eternal_shroud", name: "Eternal Shroud", cost: 3600,
+    stats: { mana: 0, mana_regen: 2.5, health: 300, health_regen: 0, armor: 0, magic_resist: 30, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["health", "mana_regen", "magic_resist", "magic_shield"],
+    description: "Provides +300 health, +30% magic resistance, +2.5 mana regen. Passive: Magic damage generates a damage barrier."
+  },
+  {
+    id: "crimson_guard", name: "Crimson Guard", cost: 3725,
+    stats: { mana: 0, mana_regen: 0, health: 250, health_regen: 4.0, armor: 3, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["health", "health_regen", "armor", "damage_block", "tank"],
+    description: "Provides +250 health, +4 HP regen, +3 armor. Active: Grant 100% damage block to nearby allies."
+  },
+  {
+    id: "lotus_orb", name: "Lotus Orb", cost: 3850,
+    stats: { mana: 0, mana_regen: 2.5, health: 0, health_regen: 5.0, armor: 10, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["armor", "health_regen", "mana_regen", "reflection", "dispel"],
+    description: "Provides +10 armor, +5 HP regen, +2.5 mana regen. Active: Apply a shield that reflects spells and dispels debuffs."
+  },
+  {
+    id: "black_king_bar", name: "Black King Bar", cost: 4050,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 12, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["strength", "damage", "magic_immunity", "tank"],
+    description: "Provides +10 Strength, +12 damage. Active: Grants magic immunity for 6-10 seconds (scales down per use)."
+  },
+  {
+    id: "bloodstone", name: "Bloodstone", cost: 4400,
+    stats: { mana: 425, mana_regen: 2.0, health: 500, health_regen: 2.0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["health", "mana", "health_regen", "mana_regen", "caster"],
+    description: "Provides +500 health, +425 mana, +2 HP regen, +2 mana regen. Passive: Gains charges on kills, reduces respawn time."
+  },
+  {
+    id: "hurricane_pike", name: "Hurricane Pike", cost: 4450,
+    stats: { mana: 0, mana_regen: 1.5, health: 0, health_regen: 5.0, armor: 0, magic_resist: 0, damage: 15, attack_speed: 15, attack_range: 130, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["attributes", "damage", "attack_speed", "attack_range", "mobility"],
+    description: "Provides +15 all attributes, +130 attack range. Active: Push yourself or an enemy away."
+  },
+  {
+    id: "manta_style", name: "Manta Style", cost: 4550,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 4.33, magic_resist: 0, damage: 26, attack_speed: 36, attack_range: 0, move_speed: 8, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["agility", "attack_speed", "armor", "damage", "move_speed", "illusions", "dispel"],
+    description: "Provides +26 Agility, +10 Strength, +10 Intelligence, +10 attack speed, +8% move speed. Active: Create 2 illusions."
+  },
+  {
+    id: "linkens_sphere", name: "Linken's Sphere", cost: 4800,
+    stats: { mana: 0, mana_regen: 2.0, health: 0, health_regen: 2.5, armor: 0, magic_resist: 0, damage: 12, attack_speed: 12, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["attributes", "health_regen", "mana_regen", "spell_block", "defense"],
+    description: "Provides +12 all attributes, +2.5 HP regen, +2 mana regen. Passive: Blocks the next targeted spell every 14 seconds."
+  },
+  {
+    id: "assault_cuirass", name: "Assault Cuirass", cost: 5125,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 20, magic_resist: 0, damage: 0, attack_speed: 25, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["armor", "attack_speed", "aura"],
+    description: "Provides +20 armor, +25 attack speed. Aura: +5 armor and -5 armor (enemy) to nearby units."
+  },
+  {
+    id: "shivas_guard", name: "Shiva's Guard", cost: 5175,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 5.0, armor: 15, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["intelligence", "armor", "health_regen", "slow"],
+    description: "Provides +30 Intelligence, +15 armor, +5 HP regen. Active: AoE slow (-40 attack speed, -25% move speed) for 4 seconds."
+  },
+  {
+    id: "heart_of_tarrasque", name: "Heart of Tarrasque", cost: 5200,
+    stats: { mana: 0, mana_regen: 8.0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 40, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["strength", "health", "health_regen", "tank"],
+    description: "Provides +40 Strength (+800 HP) and +400 HP. Passive: If no damage taken in 5 seconds, gain +6% max HP regen per second."
+  },
+
+  // ---- WEAPONS ----
+  {
+    id: "crystalys", name: "Crystalys", cost: 2000,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 35, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["damage", "crit", "physical"],
+    description: "Provides +35 damage. Passive: 25% chance to deal 150% critical damage."
+  },
+  {
+    id: "armlet_of_mordiggian", name: "Armlet of Mordiggian", cost: 2500,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 6.0, armor: 5, magic_resist: 0, damage: 9, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["damage", "armor", "health_regen", "strength"],
+    description: "Provides +9 damage, +5 armor, +6 HP regen. Active: Gain +40 damage, +10 strength, +2 HP regen, but lose 55 HP/sec."
+  },
+  {
+    id: "meteor_hammer", name: "Meteor Hammer", cost: 2850,
+    stats: { mana: 0, mana_regen: 2.0, health: 0, health_regen: 6.0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["intelligence", "mana_regen", "health_regen", "channel"],
+    description: "Provides +10 Intelligence, +6 HP regen, +2 mana regen. Active: Channel to drop a meteor dealing 145 damage and stunning."
+  },
+  {
+    id: "skull_basher", name: "Skull Basher", cost: 2875,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 35, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["damage", "strength", "bash", "disable"],
+    description: "Provides +10 Strength, +25 damage. Passive: 25% chance to bash for 1.5 seconds (melee) / 1.2 seconds (ranged)."
+  },
+  {
+    id: "shadow_blade", name: "Shadow Blade", cost: 3000,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 21, attack_speed: 18, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["damage", "attack_speed", "invisibility"],
+    description: "Provides +21 damage, +18 attack speed. Active: Invisibility for 12 seconds. Breaking invis deals +175 damage."
+  },
+  {
+    id: "desolator", name: "Desolator", cost: 3500,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 50, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["damage", "armor_reduction", "physical"],
+    description: "Provides +50 damage. Passive: Attacks reduce enemy armor by 6 for 7 seconds."
+  },
+  {
+    id: "battle_fury", name: "Battle Fury", cost: 4100,
+    stats: { mana: 0, mana_regen: 1.75, health: 0, health_regen: 2.5, armor: 0, magic_resist: 0, damage: 45, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["damage", "health_regen", "mana_regen", "cleave", "farming"],
+    description: "Provides +45 damage, +2.5 HP regen, +1.75 mana regen. Passive: 60% cleave (melee) / 30% (ranged) in a 650 AoE."
+  },
+  {
+    id: "nullifier", name: "Nullifier", cost: 4375,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 5.0, armor: 0, magic_resist: 0, damage: 20, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["damage", "health_regen", "purge", "disable"],
+    description: "Provides +20 damage, +5 HP regen. Active: Dispels and prevents buffs on an enemy for 5 seconds."
+  },
+  {
+    id: "monkey_king_bar", name: "Monkey King Bar", cost: 4700,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 40, attack_speed: 35, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["damage", "attack_speed", "true_strike", "pierce"],
+    description: "Provides +40 damage, +35 attack speed. Passive: Grants true strike. 40% chance to deal 60 bonus magic damage."
+  },
+  {
+    id: "radiance", name: "Radiance", cost: 4700,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 55, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["damage", "burn_aura", "farming", "evasion"],
+    description: "Provides +55 damage. Aura: Deals 60 magic DPS to enemies in a 700 radius. Grants 15% evasion."
+  },
+  {
+    id: "revenants_brooch", name: "Revenant's Brooch", cost: 4900,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 35, damage: 30, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["damage", "magic_resist", "magical_attack"],
+    description: "Provides +30 damage, +35% magic resistance. Active: Attacks become magical and pierce evasion for 6 seconds."
+  },
+  {
+    id: "daedalus", name: "Daedalus", cost: 5100,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 68, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["damage", "crit", "physical"],
+    description: "Provides +68 damage. Passive: 30% chance to deal 225% critical damage."
+  },
+  {
+    id: "ethereal_blade", name: "Ethereal Blade", cost: 5375,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 6.67, magic_resist: 0, damage: 40, attack_speed: 40, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["agility", "attack_speed", "armor", "damage", "ethereal", "burst"],
+    description: "Provides +40 Agility, +10 Strength, +10 Intelligence. Active: Turn target ethereal, dealing 2x agility + 1.25x intelligence as magic damage."
+  },
+  {
+    id: "khanda", name: "Khanda", cost: 5400,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 20, attack_speed: 10, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["damage", "attributes", "attack_speed", "crit", "spell_amp"],
+    description: "Provides +20 damage, +10 all attributes. Passive: +150% crit from abilities. Attacks: +100% crit."
+  },
+  {
+    id: "butterfly", name: "Butterfly", cost: 5450,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 5, magic_resist: 0, damage: 30, attack_speed: 55, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 35 },
+    tags: ["agility", "attack_speed", "armor", "damage", "evasion"],
+    description: "Provides +30 Agility (+30 damage, +30 attack speed, +5 armor), +25 attack speed, +35% evasion."
+  },
+  {
+    id: "silver_edge", name: "Silver Edge", cost: 5450,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 30, attack_speed: 30, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["damage", "attack_speed", "invisibility", "break", "crit"],
+    description: "Provides +30 damage, +30 attack speed. Active: Invisibility + break (disables passives) and +200 damage on hit."
+  },
+  {
+    id: "abyssal_blade", name: "Abyssal Blade", cost: 5525,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 15.0, armor: 0, magic_resist: 0, damage: 55, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["damage", "strength", "health_regen", "bash", "stun"],
+    description: "Provides +25 Strength, +30 damage, +15 HP regen. Active: Stun an enemy for 2 seconds. Passive: 25% bash."
+  },
+  {
+    id: "divine_rapier", name: "Divine Rapier", cost: 5600,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 330, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["damage", "high_risk"],
+    description: "Provides +330 damage. Drops on death and can be picked up by any hero."
+  },
+  {
+    id: "disperser", name: "Disperser", cost: 6100,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 20, attack_speed: 25, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["agility", "damage", "attack_speed", "slow", "dispel"],
+    description: "Provides +25 Agility, +20 damage, +10 Intelligence, +10 Strength. Active: Slow and dispel enemy."
+  },
+  {
+    id: "bloodthorn", name: "Bloodthorn", cost: 6625,
+    stats: { mana: 0, mana_regen: 2.0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 0, attack_speed: 55, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["intelligence", "attack_speed", "mana_regen", "silence", "crit"],
+    description: "Provides +25 Intelligence, +25 attack speed, +2 mana regen. Active: Silence + amplify damage + 100% crit."
+  },
+
+  // ---- ARTIFACTS ----
+  {
+    id: "dragon_lance", name: "Dragon Lance", cost: 1900,
+    stats: { mana: 0, mana_regen: 0, health: 120, health_regen: 0.6, armor: 2, magic_resist: 0, damage: 12, attack_speed: 12, attack_range: 130, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["strength", "agility", "health", "attack_speed", "attack_range", "damage"],
+    description: "Provides +12 Strength and +12 Agility (+120 HP, +12 attack speed, +2 armor, +12 damage). +130 attack range (ranged)."
+  },
+  {
+    id: "kaya", name: "Kaya", cost: 2100,
+    stats: { mana: 180, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 15, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 8, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["intelligence", "mana", "damage", "spell_amp", "caster"],
+    description: "Provides +15 Intelligence, +8% spell amp, -8% mana cost, +15 damage."
+  },
+  {
+    id: "sange", name: "Sange", cost: 2100,
+    stats: { mana: 0, mana_regen: 0, health: 300, health_regen: 1.5, armor: 0, magic_resist: 0, damage: 25, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 12, evasion: 0 },
+    tags: ["strength", "health", "damage", "status_resist"],
+    description: "Provides +15 Strength (+300 HP, +1.5 HP regen), +10 damage, +12% status resistance."
+  },
+  {
+    id: "yasha", name: "Yasha", cost: 2100,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 2.5, magic_resist: 0, damage: 15, attack_speed: 25, attack_range: 0, move_speed: 8, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["agility", "attack_speed", "armor", "damage", "move_speed"],
+    description: "Provides +15 Agility, +10 attack speed, +8% move speed."
+  },
+  {
+    id: "phylactery", name: "Phylactery", cost: 2400,
+    stats: { mana: 100, mana_regen: 0, health: 100, health_regen: 0, armor: 0, magic_resist: 0, damage: 8, attack_speed: 8, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["attributes", "health", "mana", "spell_amp"],
+    description: "Provides +8 all attributes, +100 health, +100 mana. Passive: Single-target spells and items deal +60 bonus damage."
+  },
+  {
+    id: "diffusal_blade", name: "Diffusal Blade", cost: 2500,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 1.67, magic_resist: 0, damage: 18, attack_speed: 10, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["agility", "intelligence", "damage", "attack_speed", "mana_burn", "slow"],
+    description: "Provides +10 Agility, +10 Intelligence, +8 damage. Passive: Burns 30 mana per hit. Active: Slow enemy by 100% for 4 seconds."
+  },
+  {
+    id: "echo_sabre", name: "Echo Sabre", cost: 2700,
+    stats: { mana: 0, mana_regen: 1.25, health: 120, health_regen: 0.6, armor: 2, magic_resist: 0, damage: 22, attack_speed: 12, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["strength", "agility", "damage", "attack_speed", "mana_regen", "double_hit"],
+    description: "Provides +12 Strength, +12 Agility, +10 damage, +1.25 mana regen. Passive: Attacks hit twice in quick succession."
+  },
+  {
+    id: "mage_slayer", name: "Mage Slayer", cost: 2825,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 20, damage: 12, attack_speed: 20, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["damage", "attack_speed", "magic_resist", "silence", "magic_weakness"],
+    description: "Provides +12 damage, +20 attack speed, +20% magic resistance. Passive: Reducing enemy spell damage by 35% for 6 seconds."
+  },
+  {
+    id: "maelstrom", name: "Maelstrom", cost: 2950,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 24, attack_speed: 25, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["damage", "attack_speed", "chain_lightning", "farming"],
+    description: "Provides +24 damage, +25 attack speed. Passive: 30% chance to release chain lightning dealing 120 magic damage to 4 targets."
+  },
+  {
+    id: "heavens_halberd", name: "Heaven's Halberd", cost: 3550,
+    stats: { mana: 0, mana_regen: 0, health: 400, health_regen: 2.0, armor: 0, magic_resist: 0, damage: 35, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 12, evasion: 20 },
+    tags: ["strength", "health", "damage", "evasion", "status_resist", "disarm"],
+    description: "Provides +20 Strength, +15 damage, +20% evasion, +12% status resistance. Active: Disarm a melee/ranged hero for 3/4 seconds."
+  },
+  {
+    id: "yasha_and_kaya", name: "Yasha and Kaya", cost: 4000,
+    stats: { mana: 180, mana_regen: 0, health: 0, health_regen: 0, armor: 2.5, magic_resist: 0, damage: 27, attack_speed: 35, attack_range: 0, move_speed: 8, spell_amp: 8, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["agility", "intelligence", "attack_speed", "damage", "move_speed", "spell_amp", "mana", "caster"],
+    description: "The ultimate combination of Yasha and Kaya. +15 Agility, +15 Intelligence, +12 damage, +12 attack speed, +8% move speed, +8% spell amp, -8% mana cost."
+  },
+  {
+    id: "kaya_and_sange", name: "Kaya and Sange", cost: 4050,
+    stats: { mana: 180, mana_regen: 0, health: 300, health_regen: 1.5, armor: 0, magic_resist: 0, damage: 37, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 8, lifesteal: 0, status_resist: 16, evasion: 0 },
+    tags: ["strength", "intelligence", "health", "damage", "spell_amp", "status_resist", "caster"],
+    description: "The ultimate combination of Kaya and Sange. +15 Strength, +15 Intelligence, +12 damage, +12% status resistance, +8% spell amp, -8% mana cost."
+  },
+  {
+    id: "sange_and_yasha", name: "Sange and Yasha", cost: 4200,
+    stats: { mana: 0, mana_regen: 0, health: 300, health_regen: 1.5, armor: 2.5, magic_resist: 0, damage: 41, attack_speed: 35, attack_range: 0, move_speed: 8, spell_amp: 0, lifesteal: 0, status_resist: 12, evasion: 0 },
+    tags: ["strength", "agility", "health", "damage", "attack_speed", "armor", "move_speed", "status_resist"],
+    description: "The ultimate combination of Sange and Yasha. +15 Strength, +15 Agility, +16 damage, +16 attack speed, +12% status resistance, +8% move speed."
+  },
+  {
+    id: "harpoon", name: "Harpoon", cost: 4700,
+    stats: { mana: 0, mana_regen: 1.25, health: 120, health_regen: 0.6, armor: 2, magic_resist: 0, damage: 25, attack_speed: 12, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["strength", "agility", "damage", "attack_speed", "mana_regen", "pull"],
+    description: "Provides +15 Strength, +15 Agility, +10 damage, +1.25 mana regen. Active: Pull an enemy toward you."
+  },
+  {
+    id: "satanic", name: "Satanic", cost: 5050,
+    stats: { mana: 0, mana_regen: 0, health: 500, health_regen: 2.5, armor: 0, magic_resist: 0, damage: 25, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 25, status_resist: 0, evasion: 0 },
+    tags: ["strength", "health", "damage", "lifesteal"],
+    description: "Provides +25 Strength, +25% lifesteal. Active: Unholy Rage — +200% lifesteal for 6 seconds."
+  },
+  {
+    id: "eye_of_skadi", name: "Eye of Skadi", cost: 5300,
+    stats: { mana: 250, mana_regen: 1.0, health: 250, health_regen: 1.0, armor: 4.17, magic_resist: 0, damage: 35, attack_speed: 25, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["attributes", "health", "mana", "damage", "attack_speed", "slow"],
+    description: "Provides +25 all attributes, +250 health, +250 mana. Passive: Attacks slow enemies by 35% move speed and 35 attack speed."
+  },
+  {
+    id: "mjollnir", name: "Mjollnir", cost: 5500,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 24, attack_speed: 70, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["damage", "attack_speed", "chain_lightning", "farming"],
+    description: "Provides +24 damage, +70 attack speed. Passive: 30% chain lightning (180 magic dmg to 4 targets). Active: Barrier that zaps attackers."
+  },
+  {
+    id: "arcane_blink", name: "Arcane Blink", cost: 6800,
+    stats: { mana: 300, mana_regen: 2.5, health: 0, health_regen: 0, armor: 0, magic_resist: 0, damage: 25, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["intelligence", "mana", "mana_regen", "blink", "mobility", "caster"],
+    description: "Provides +25 Intelligence, +300 mana, +2.5 mana regen, +25 damage. Blink Dagger upgrade — resets blink cooldown on spell cast."
+  },
+  {
+    id: "overwhelming_blink", name: "Overwhelming Blink", cost: 6800,
+    stats: { mana: 0, mana_regen: 0, health: 500, health_regen: 2.5, armor: 0, magic_resist: 0, damage: 35, attack_speed: 0, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["strength", "health", "damage", "blink", "mobility", "tank"],
+    description: "Provides +25 Strength, +500 HP, +2.5 HP regen, +35 damage. Blink Dagger upgrade — AoE slow and damage on blink."
+  },
+  {
+    id: "swift_blink", name: "Swift Blink", cost: 6800,
+    stats: { mana: 0, mana_regen: 0, health: 0, health_regen: 0, armor: 4.17, magic_resist: 0, damage: 35, attack_speed: 35, attack_range: 0, move_speed: 0, spell_amp: 0, lifesteal: 0, status_resist: 0, evasion: 0 },
+    tags: ["agility", "damage", "attack_speed", "armor", "blink", "mobility"],
+    description: "Provides +25 Agility, +35 damage, +35 attack speed. Blink Dagger upgrade — grants +40% move speed on blink."
+  }
+];
+
+// ============================================================
+// APP STATE
+// ============================================================
+let filteredItems = [...items];
+let selectedItemId = null;
+let currentSort = "name-asc";
+
+// Collect all unique tags
+const allTags = [...new Set(items.flatMap(i => i.tags))].sort();
+
+// Predefined main effect tags
+const mainEffectTags = [
+  "mana", "mana_regen", "health", "health_regen", "armor", "magic_resist",
+  "damage", "attack_speed", "attack_range", "move_speed",
+  "lifesteal", "spell_amp", "status_resist", "evasion"
+];
+
+// Other tags (everything not a main effect)
+const otherTags = allTags.filter(t => !mainEffectTags.includes(t));
+
+// ============================================================
+// UI BUILDERS
+// ============================================================
+function getItemIconHTML(item) {
+  // Find the dominant stat by highest value (cost-weighted for fairness)
+  const statIconMap = {
+    damage: "\u2694\uFE0F",
+    mana: "\u{1F4A7}",
+    health: "\u{2764}\uFE0F",
+    attack_speed: "\u26A1",
+    armor: "\u{1F6E1}\uFE0F",
+    move_speed: "\u{1F97E}",
+    mana_regen: "\u{1FAB9}",
+    health_regen: "\u{1F9CD}",
+    spell_amp: "\u{1F9D9}",
+    lifesteal: "\u{1FA78}",
+    evasion: "\u{1F98B}",
+    magic_resist: "\u{1F9F0}",
+    attack_range: "\u{1F3AF}",
+    status_resist: "\u{1F9E1}"
+  };
+
+  let bestStat = null;
+  let bestValue = 0;
+
+  for (const stat of Object.keys(statIconMap)) {
+    const val = Math.abs(item.stats[stat]) || 0;
+    if (val > bestValue) {
+      bestValue = val;
+      bestStat = stat;
+    }
+  }
+
+  if (bestStat && bestValue > 0) {
+    return statIconMap[bestStat];
+  }
+
+  // Fallback for items with no stats (consumables, utilities)
+  if (item.tags.includes("consumable")) return "\u{1F3F7}\uFE0F";
+  if (item.tags.includes("boots")) return "\u{1F97E}";
+  if (item.tags.includes("support")) return "\u{1F9F8}";
+  if (item.tags.includes("blink")) return "\u26A1";
+  if (item.tags.includes("vision") || item.tags.includes("true_sight")) return "\u{1F441}\uFE0F";
+  if (item.tags.includes("teleport")) return "\u{1F4EC}";
+  return "\u{1F4E6}";
+}
+
+function getStatSummary(item) {
+  const parts = [];
+  if (item.stats.mana > 0) parts.push(`+${item.stats.mana} \u{1F4A7}`);
+  if (item.stats.health > 0) parts.push(`+${item.stats.health} \u{2764}\uFE0F`);
+  if (item.stats.damage > 0) parts.push(`+${item.stats.damage} \u{2694}\uFE0F`);
+  if (item.stats.armor > 0) parts.push(`+${item.stats.armor} \u{1F6E1}\uFE0F`);
+  if (item.stats.attack_speed > 0) parts.push(`+${item.stats.attack_speed} AS`);
+  if (item.stats.move_speed > 0) parts.push(`+${item.stats.move_speed} MS`);
+  if (item.stats.mana_regen > 0) parts.push(`+${item.stats.mana_regen} MR`);
+  if (item.stats.health_regen > 0) parts.push(`+${item.stats.health_regen} HR`);
+  if (item.stats.magic_resist > 0) parts.push(`+${item.stats.magic_resist}% MR`);
+  if (item.stats.evasion > 0) parts.push(`+${item.stats.evasion}% Ev`);
+  if (item.stats.spell_amp > 0) parts.push(`+${item.stats.spell_amp}% SA`);
+  if (item.stats.lifesteal > 0) parts.push(`+${item.stats.lifesteal}% LS`);
+  if (item.stats.status_resist > 0) parts.push(`+${item.stats.status_resist}% SR`);
+  if (item.stats.attack_range > 0) parts.push(`+${item.stats.attack_range} Rng`);
+  return parts.join(" | ");
+}
+
+const statLabels = {
+  mana: "Mana", mana_regen: "Mana Regen", health: "Health", health_regen: "HP Regen",
+  armor: "Armor", magic_resist: "Magic Resist", damage: "Damage", attack_speed: "Attack Speed",
+  attack_range: "Attack Range", move_speed: "Move Speed", spell_amp: "Spell Amp",
+  lifesteal: "Lifesteal", status_resist: "Status Resist", evasion: "Evasion"
+};
+
+// ============================================================
+// RENDER FUNCTIONS
+// ============================================================
+function renderItemList() {
+  const listEl = document.getElementById("itemList");
+  const countEl = document.getElementById("resultsCount");
+  countEl.textContent = `Showing ${filteredItems.length} items`;
+
+  if (filteredItems.length === 0) {
+    listEl.innerHTML = '<div class="no-results">No items match your filters.</div>';
+    return;
+  }
+
+  listEl.innerHTML = filteredItems.map(item => {
+    const isSelected = item.id === selectedItemId;
+    const summary = getStatSummary(item);
+    return `
+      <div class="item-card ${isSelected ? 'selected' : ''}" data-item-id="${item.id}" onclick="selectItem('${item.id}')">
+        <div class="item-icon">${getItemIconHTML(item)}</div>
+        <div class="item-info">
+          <div class="item-name">${item.name}</div>
+          <div class="item-cost">\u{1F4B0} ${item.cost}</div>
+          <div class="item-tags-preview">
+            ${item.tags.slice(0, 3).map(t => `<span class="tag-pill-mini">${t.replace(/_/g, ' ')}</span>`).join('')}
+          </div>
+          ${summary ? `<div class="item-stats-preview">${summary}</div>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderDetail() {
+  const detailEl = document.getElementById("detailSection");
+  const item = items.find(i => i.id === selectedItemId);
+  if (!item) {
+    detailEl.innerHTML = '<div class="detail-empty"><span>Click an item to see its details.</span></div>';
+    return;
+  }
+
+  // Stats with values > 0
+  const statEntries = Object.entries(statLabels)
+    .filter(([key]) => item.stats[key] > 0)
+    .map(([key, label]) => {
+      const val = item.stats[key];
+      return `<div class="detail-stat-row"><span class="stat-label">${label}</span><span class="stat-value positive">+${val}</span></div>`;
+    }).join('');
+
+  detailEl.innerHTML = `
+    <div class="detail-header">
+      <div class="detail-name">${item.name}</div>
+      <div class="detail-cost">\u{1F4B0} ${item.cost} Gold</div>
+    </div>
+    <div class="detail-section-title">Stats</div>
+    <div class="detail-stats-grid">
+      ${statEntries || '<div style="color:#5a6480; font-size:13px;">No base stat bonuses.</div>'}
+    </div>
+    <div class="detail-section-title">Effects / Tags</div>
+    <div class="detail-tags">
+      ${item.tags.map(t => `<span class="tag-pill">${t.replace(/_/g, ' ')}</span>`).join('')}
+    </div>
+    <div class="detail-section-title">Description</div>
+    <div class="detail-description">${item.description}</div>
+  `;
+}
+
+function renderCheckboxes() {
+  const mainEl = document.getElementById("mainEffects");
+  mainEl.innerHTML = mainEffectTags.map(tag => `
+    <label data-tag="${tag}">
+      <input type="checkbox" value="${tag}" onchange="toggleEffect('${tag}')">
+      ${statLabels[tag] || tag.replace(/_/g, ' ')}
+    </label>
+  `).join('');
+
+  const otherEl = document.getElementById("otherEffects");
+  document.getElementById("otherCount").textContent = otherTags.length;
+  if (otherTags.length > 0) {
+    otherEl.innerHTML = otherTags.map(tag => `
+      <label data-tag="${tag}">
+        <input type="checkbox" value="${tag}" onchange="toggleEffect('${tag}')">
+        ${tag.replace(/_/g, ' ')}
+      </label>
+    `).join('');
+  } else {
+    otherEl.innerHTML = '<div style="color:#5a6480;font-size:12px;">No additional effects found.</div>';
+  }
+}
+
+// ============================================================
+// FILTER & SORT LOGIC
+// ============================================================
+function getActiveEffects() {
+  const checked = document.querySelectorAll('.checkbox-grid input[type="checkbox"]:checked');
+  return new Set([...checked].map(cb => cb.value));
+}
+
+function applyFiltersAndSort() {
+  const search = document.getElementById("searchBox").value.toLowerCase().trim();
+  const minCost = parseInt(document.getElementById("minCost").value) || 0;
+  const maxCost = parseInt(document.getElementById("maxCost").value) || Infinity;
+  const sortBy = document.getElementById("sortBy").value;
+  const activeEffects = getActiveEffects();
+  const totalEffects = document.querySelectorAll('.checkbox-grid input[type="checkbox"]').length;
+
+  currentSort = sortBy;
+
+  let result = items.filter(item => {
+    // Name search
+    if (search && !item.name.toLowerCase().includes(search)) return false;
+
+    // Cost filter
+    if (item.cost < minCost || item.cost > maxCost) return false;
+
+    // Effect filter (OR logic):
+    // If ALL checkboxes are checked, skip filter (show all items).
+    // If some are unchecked, show items that have ANY of the checked effects.
+    if (activeEffects.size > 0 && activeEffects.size < totalEffects) {
+      const itemTags = new Set(item.tags);
+      const hasAny = [...activeEffects].some(effect => itemTags.has(effect));
+      if (!hasAny) return false;
+    }
+
+    return true;
+  });
+
+  // Sort
+  result.sort((a, b) => {
+    const [field, dir] = sortBy.split('-');
+
+    if (field === 'name') {
+      return dir === 'asc'
+        ? a.name.localeCompare(b.name)
+        : b.name.localeCompare(a.name);
+    }
+    if (field === 'cost') {
+      return dir === 'asc'
+        ? (a.cost - b.cost)
+        : (b.cost - a.cost);
+    }
+    // Stats: always return bVal - aVal for descending (High → Low)
+    const aVal = a.stats[field] || 0;
+    const bVal = b.stats[field] || 0;
+    return bVal - aVal;
+  });
+
+  filteredItems = result;
+
+  // If selected item no longer in results, deselect
+  if (selectedItemId && !result.some(i => i.id === selectedItemId)) {
+    selectedItemId = null;
+  }
+
+  renderItemList();
+  renderDetail();
+}
+
+// ============================================================
+// EVENT HANDLERS
+// ============================================================
+function selectItem(id) {
+  selectedItemId = id;
+  renderItemList();
+  renderDetail();
+  // scroll item into view
+  const el = document.querySelector(`.item-card[data-item-id="${id}"]`);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function toggleEffect(tag) {
+  const cb = document.querySelector(`.checkbox-grid input[value="${tag}"]`);
+  if (!cb) return;
+  const label = cb.closest('label');
+  if (label) label.classList.toggle('checked', cb.checked);
+  applyFiltersAndSort();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  renderCheckboxes();
+  applyFiltersAndSort();
+
+  // Bind events
+  document.getElementById("searchBox").addEventListener("input", applyFiltersAndSort);
+  document.getElementById("minCost").addEventListener("change", applyFiltersAndSort);
+  document.getElementById("maxCost").addEventListener("change", applyFiltersAndSort);
+  document.getElementById("sortBy").addEventListener("change", applyFiltersAndSort);
+
+  // Other effects toggle
+  document.getElementById("otherToggle").addEventListener("click", () => {
+    const section = document.getElementById("otherSection");
+    section.classList.toggle("open");
+    document.getElementById("otherToggle").textContent =
+      section.classList.contains("open") ? "\u25B9 Other Effects" : "\u25B8 Other Effects";
+  });
+});
+</script>
+
+</body>
+</html>
