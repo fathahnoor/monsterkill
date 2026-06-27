@@ -1,4 +1,4 @@
-# ⚔️ MONSTERKILL — Dota 2 Item Browser
+# ⚔️ MONSTERKILL: Dota 2 Item Browser
 
 <div align="center">
 
@@ -10,7 +10,7 @@
 
 **_Learn Smart. Win Hard._**
 
-[🚀 Live Demo](#) · [🐛 Report Bug](../../issues/new?labels=bug) · [💡 Request Feature](../../issues/new?labels=enhancement) · [🤝 Contribute](#-contributing)
+[🌐 Web](https://fathahnoor.github.io/monsterkill) · [🐛 Report Bug](../../issues/new?labels=bug) · [💡 Request Feature](../../issues/new?labels=enhancement) · [🤝 Contribute](#-contributing)
 
 </div>
 
@@ -18,9 +18,9 @@
 
 ## 🎮 Apa Itu MONSTERKILL?
 
-Pernah nggak lagi **draft phase**, panik mikir _"item apa yang bisa counter Spectre?"_ atau _"item mana yang kasih lifesteal tertinggi?"_ — dan kamu harus buka 5 tab berbeda buat nemuin jawabannya?
+Pernah nggak lagi **draft phase**, panik mikir _"item apa yang bisa counter Spectre?"_ atau _"item mana yang kasih lifesteal tertinggi?"_ dan kamu harus buka 5 tab berbeda buat nemuin jawabannya?
 
-**MONSTERKILL** adalah browser item Dota 2 yang ringan, cepat, dan bisa jalan **langsung di browser tanpa install apapun**. Semua data item patch **7.41d** ada di sini — bisa kamu filter, sort, dan bandingkan dalam hitungan detik.
+**MONSTERKILL** adalah browser item Dota 2 yang ringan, cepat, dan bisa jalan **langsung di browser tanpa install apapun**. Semua data item patch **7.41d** ada di sini, bisa kamu filter, sort, dan bandingkan dalam hitungan detik.
 
 > No ads. No login. No backend. Pure Dota knowledge. ⚡
 
@@ -34,7 +34,7 @@ Pernah nggak lagi **draft phase**, panik mikir _"item apa yang bisa counter Spec
 | 🏷️ **Filter by Effect** | Filter berdasarkan tag: lifesteal, evasion, slow, invisibility, dll |
 | 💰 **Cost Range Filter** | Filter item berdasarkan rentang harga gold |
 | 📊 **Multi-Sort** | Sort by damage, armor, mana, move speed, attack speed, dan banyak lagi |
-| 📋 **Detail Panel** | Klik item → lihat semua stats, tags, dan deskripsi lengkap |
+| 📋 **Detail Panel** | Klik item, lihat semua stats, tags, dan deskripsi lengkap |
 | 📱 **Fully Responsive** | Nyaman di desktop, tablet, maupun mobile |
 | ⚡ **Zero Dependencies** | Satu file HTML, tidak butuh Node.js, server, atau framework apapun |
 
@@ -42,17 +42,20 @@ Pernah nggak lagi **draft phase**, panik mikir _"item apa yang bisa counter Spec
 
 ## 🚀 Cara Pakai
 
-### Option 1 — Buka Langsung (Paling Gampang)
-Download file `index.html` → buka di browser. Selesai. Tidak ada proses install.
+### Option 1: Buka via Web (Paling Gampang)
+Kunjungi langsung: **[fathahnoor.github.io/monsterkill](https://fathahnoor.github.io/monsterkill)**
 
-### Option 2 — Clone & Run
+### Option 2: Download & Buka Lokal
+Download file `index.html`, lalu buka di browser. Selesai. Tidak ada proses install.
+
+### Option 3: Clone & Run
 ```bash
 git clone https://github.com/fathahnoor/monsterkill.git
 cd monsterkill
 ```
 Lalu buka `index.html` di browser favorit kamu.
 
-### Option 3 — Windows Batch Server (Local Dev)
+### Option 4: Windows Batch Server (Local Dev)
 ```bash
 # Double-click run.bat atau jalankan di terminal:
 run.bat
@@ -84,10 +87,10 @@ Script ini akan menjalankan local server sederhana agar kamu bisa develop dengan
 
 ## 🧠 Untuk Siapa Tool Ini?
 
-- 🆕 **Pemain Baru** — masih belajar fungsi tiap item
-- 📈 **Player Climbing MMR** — butuh referensi cepat pas draft atau laning
-- 🎓 **Coach & Analyst** — research item build untuk spesifik hero/situasi
-- 🛠️ **Developer** — yang mau extend tool ini jadi sesuatu yang lebih keren
+- 🆕 **Pemain Baru**: masih belajar fungsi tiap item
+- 📈 **Player Climbing MMR**: butuh referensi cepat pas draft atau laning
+- 🎓 **Coach & Analyst**: research item build untuk spesifik hero/situasi
+- 🛠️ **Developer**: yang mau extend tool ini jadi sesuatu yang lebih keren
 
 ---
 
@@ -95,14 +98,14 @@ Script ini akan menjalankan local server sederhana agar kamu bisa develop dengan
 
 ```
 📁 monsterkill/
-├── index.html     ← Seluruh app (HTML + CSS + JS in one file)
-└── run.bat        ← Local server launcher (Windows)
+├── index.html     <- Seluruh app (HTML + CSS + JS in one file)
+└── run.bat        <- Local server launcher (Windows)
 ```
 
-- **Pure Vanilla HTML/CSS/JS** — no React, no Vue, no bundler
-- **Embedded Item Database** — data patch 7.41d sudah hardcoded di JS
-- **CSS Grid + Flexbox** — responsive layout tanpa library
-- **Zero External Dependencies** — bisa jalan offline sepenuhnya
+- **Pure Vanilla HTML/CSS/JS**: no React, no Vue, no bundler
+- **Embedded Item Database**: data patch 7.41d sudah hardcoded di JS
+- **CSS Grid + Flexbox**: responsive layout tanpa library
+- **Zero External Dependencies**: bisa jalan offline sepenuhnya
 
 ---
 
@@ -114,17 +117,17 @@ Script ini akan menjalankan local server sederhana agar kamu bisa develop dengan
 
 👉 [**Buka Feature Request Issue**](../../issues/new?labels=enhancement)
 
-Beberapa ide yang **sangat dibutuhkan** dan belum ada — siapa yang mau mulai?
+Beberapa ide yang **sangat dibutuhkan** dan belum ada. Siapa yang mau mulai?
 
-- [ ] 🦸 **Hero Builder** — simulasi item build per hero + total stats
-- [ ] ⚔️ **Item Comparison Mode** — compare 2 item side by side
-- [ ] 🔄 **Build Path Viewer** — lihat komponen penyusun item (recipe tree)
-- [ ] 🌙 **Item Recommender** — suggest item berdasarkan hero + situasi game
-- [ ] 📊 **Stats Chart** — visualisasi bar chart perbandingan stat item
-- [ ] 🌐 **Multi-Language** — support Bahasa Indonesia & bahasa lainnya
-- [ ] 🔔 **Patch Tracker** — highlight item yang berubah tiap patch baru
-- [ ] 🎯 **Counter-Item Finder** — "cari item yang counter hero X"
-- [ ] ⏰ **Patch Auto-Update** — data item update otomatis saat patch baru rilis
+- [ ] 🦸 **Hero Builder**: simulasi item build per hero + total stats
+- [ ] ⚔️ **Item Comparison Mode**: compare 2 item side by side
+- [ ] 🔄 **Build Path Viewer**: lihat komponen penyusun item (recipe tree)
+- [ ] 🌙 **Item Recommender**: suggest item berdasarkan hero + situasi game
+- [ ] 📊 **Stats Chart**: visualisasi bar chart perbandingan stat item
+- [ ] 🌐 **Multi-Language**: support Bahasa Indonesia & bahasa lainnya
+- [ ] 🔔 **Patch Tracker**: highlight item yang berubah tiap patch baru
+- [ ] 🎯 **Counter-Item Finder**: cari item yang counter hero X
+- [ ] ⏰ **Patch Auto-Update**: data item update otomatis saat patch baru rilis
 
 ### 🐛 Nemu Bug atau Data Item yang Salah?
 
@@ -136,13 +139,13 @@ Beberapa ide yang **sangat dibutuhkan** dan belum ada — siapa yang mau mulai?
 2. **Buat branch** baru: `git checkout -b feature/nama-fiturmu`
 3. **Commit** perubahanmu: `git commit -m 'feat: tambah fitur XYZ'`
 4. **Push** ke branch: `git push origin feature/nama-fiturmu`
-5. **Buka Pull Request** — describe apa yang kamu tambahkan dan kenapa
+5. **Buka Pull Request**: describe apa yang kamu tambahkan dan kenapa
 
 ### ✅ Guidelines Kontribusi
 
 - Pertahankan pendekatan **zero-dependency** (vanilla JS/HTML/CSS only, kecuali ada alasan kuat)
 - Data item harus akurat sesuai patch terbaru Dota 2
-- Kode harus readable — tambahkan komentar singkat jika logika kompleks
+- Kode harus readable, tambahkan komentar singkat jika logika kompleks
 - Test di Chrome, Firefox, dan mobile browser sebelum submit PR
 - Commit message mengikuti format: `feat:`, `fix:`, `data:`, `docs:`
 
@@ -181,7 +184,7 @@ Saat membuka issue, gunakan label yang sesuai agar lebih mudah dikelola:
 ## 📜 License
 
 Proyek ini open source di bawah lisensi **[MIT](LICENSE)**.
-Data item Dota 2 adalah milik © Valve Corporation — digunakan untuk keperluan edukasi dan komunitas non-komersial.
+Data item Dota 2 adalah milik © Valve Corporation, digunakan untuk keperluan edukasi dan komunitas non-komersial.
 
 ---
 
@@ -189,13 +192,13 @@ Data item Dota 2 adalah milik © Valve Corporation — digunakan untuk keperluan
 
 Dibuat dengan ❤️ oleh **[@fathahnoor](https://github.com/fathahnoor)** untuk komunitas Dota 2.
 
-Kalau tool ini membantu kamu menang game atau naik MMR — **kasih ⭐ star** di repo ini!
+Kalau tool ini membantu kamu menang game atau naik MMR, **kasih ⭐ star** di repo ini!
 Itu adalah motivasi terbesar untuk terus update dan ngembangkan fitur baru.
 
 ```
                    GG WP! 🎮
         "The battle is won before it's fought."
-              — Sun Tzu (dan Ancient kamu)
+              -- Sun Tzu (dan Ancient kamu)
 ```
 
 <div align="center">
