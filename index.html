@@ -91,14 +91,7 @@
     color: #f7931e;
     text-decoration: underline;
   }
-  .visitor-count {
-    margin-top: 8px;
-    font-size: 11px;
-    color: #3a4260;
-  }
-  .visitor-count span {
-    color: #6b7490;
-  }
+
   .app-layout {
     display: flex;
     gap: 0;
@@ -509,7 +502,7 @@
   <strong>MONSTERKILL</strong> is a fan project and is not affiliated with Valve Corporation.
   Dota 2 and the Dota 2 logo are registered trademarks of Valve Corporation.
   All item names, icons, and game data are property of Valve Corporation.
-  <div class="visitor-count">👁️ <span id="visitorCount">—</span> visitors</div>
+  <!-- Histats.com  (div with counter) --><div id="histats_counter"></div>
 </footer>
 <script>
 // ============================================================
@@ -2008,21 +2001,19 @@ document.addEventListener('DOMContentLoaded', () => {
       section.classList.contains("open") ? "\u25B9 Other Effects" : "\u25B8 Other Effects";
   });
 });
-// ---- VISITOR COUNTER ----
-(function() {
-  try {
-    const key = "monsterkill-visitors";
-    let count = parseInt(localStorage.getItem(key) || "0", 10) + 1;
-    localStorage.setItem(key, count);
-    document.getElementById("visitorCount").textContent = count.toLocaleString();
-  } catch(e) {
-    let count = 0;
-    document.getElementById("visitorCount").textContent = "? ";
-  }
-})();
-  }
-})();
 </script>
+n<!-- Histats.com  START  (aync)-->
+<script type="text/javascript">var _Hasync= _Hasync|| [];
+_Hasync.push(['Histats.start', '1,5035996,4,511,95,18,00000000']);
+_Hasync.push(['Histats.fasi', '1']);
+_Hasync.push(['Histats.track_hits', '']);
+(function() {
+var hs = document.createElement('script'); hs.type = 'text/javascript'; hs.async = true;
+hs.src = ('//s10.histats.com/js15_as.js');
+(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(hs);
+})();</script>
+<noscript><a href="/" target="_blank"><img  src="//sstatic1.histats.com/0.gif?5035996&101" alt="" border="0"></a></noscript>
+<!-- Histats.com  END  -->
 
 </body>
 </html>
