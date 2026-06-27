@@ -1704,19 +1704,32 @@ function getItemIconHTML(item) {
     iron_branch: 'branches',
     sacred_relic: 'relic',
     crystalys: 'lesser_crit',
-    boots_of_travel_2: 'travel_boots_2',
-    aghanims_blessing: 'ultimate_scepter_2'
+    boots_of_travel_2: 'travel_boots_2'
   };
 
-  const iconName = iconNameMap[item.id] || item.id;
+  // Local curated assets for items not on Steam CDN
+  const localAssetMap = {
+    morbid_mask: 'assets/morbidmask.jpeg',
+    perseverance: 'assets/perseverance.jpeg',
+    khanda: 'assets/khanda.jpeg',
+    band_of_elvenskin: 'assets/bandofelvenskin.jpeg',
+    chasm_stone: 'assets/chasmstone.jpeg',
+    shawl: 'assets/shawl.jpeg',
+    splintmail: 'assets/splintmail.jpeg',
+    wizard_hat: 'assets/wizardhat.jpeg',
+    consecrated_wraps: 'assets/consecratedwraps.jpeg',
+    crellas_crozier: 'assets/crellascrozier.jpeg',
+    specialists_array: 'assets/specialistsarray.jpeg',
+    hydras_breath: 'assets/hydrasbreath.jpeg',
+    aghanims_blessing: 'assets/aghanimsblessing.jpeg'
+  };
   
-  // Items not on Steam CDN - use Dota 2 Wiki
-  const wikiOnly = ['morbid_mask', 'perseverance', 'khanda', 'band_of_elvenskin', 'chasm_stone', 'shawl', 'splintmail', 'wizard_hat', 'consecrated_wraps', 'crellas_crozier', 'specialists_array', 'hydras_breath'];
-  if (wikiOnly.includes(item.id)) {
-    const wf = encodeURIComponent(item.name + ' icon.png');
-    return `<img src="https://dota2.fandom.com/wiki/Special:Redirect/file/${wf}" alt="${item.name}" loading="lazy" onerror="this.onerror=null;this.parentElement.textContent='${getFallbackEmoji(item)}'">`;
+  // Check local assets first
+  if (localAssetMap[item.id]) {
+    return `<img src="${localAssetMap[item.id]}" alt="${item.name}" loading="lazy" onerror="this.onerror=null;this.parentElement.textContent='${getFallbackEmoji(item)}'">`;
   }
-  
+
+  const iconName = iconNameMap[item.id] || item.id;
   const iconUrl = `${CDN_BASE}${iconName}_lg.png`;
   return `<img src="${iconUrl}" alt="${item.name}" loading="lazy" onerror="this.onerror=null;this.parentElement.textContent='${getFallbackEmoji(item)}'">`;
 }
