@@ -201,6 +201,13 @@
     justify-content: center;
     font-size: 16px;
     flex-shrink: 0;
+    overflow: hidden;
+  }
+  .item-card .item-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
   }
   .item-card .item-info { flex: 1; min-width: 0; }
   .item-card .item-name {
@@ -1529,7 +1536,45 @@ const otherTags = allTags.filter(t => !mainEffectTags.includes(t));
 // UI BUILDERS
 // ============================================================
 function getItemIconHTML(item) {
-  // Find the dominant stat by highest value (cost-weighted for fairness)
+  // Steam CDN base URL for Dota 2 item icons
+  const CDN_BASE = 'https://cdn.cloudflare.steamstatic.com/apps/dota2/images/items/';
+  
+  // Map of item IDs to their Steam CDN filenames (only where they differ)
+  const iconNameMap = {
+    blink_dagger: 'blink',
+    divine_rapier: 'rapier',
+    boots_of_travel: 'travel_boots',
+    boots_of_speed: 'boots',
+    healing_salve: 'flask',
+    town_portal_scroll: 'tpscroll',
+    observer_ward: 'ward_observer',
+    sentry_ward: 'ward_sentry',
+    dust_of_appearance: 'dust',
+    manta_style: 'manta',
+    heart_of_tarrasque: 'heart',
+    assault_cuirass: 'assault',
+    daedalus: 'greater_crit',
+    linkens_sphere: 'sphere',
+    scythe_of_vyse: 'sheepstick',
+    refresher_orb: 'refresher',
+    euls_scepter: 'cyclone',
+    battle_fury: 'bfury',
+    gem_of_true_sight: 'gem',
+    eye_of_skadi: 'skadi',
+    aghanims_scepter: 'ultimate_scepter',
+    armlet_of_mordiggian: 'armlet',
+    vladmirs_offering: 'vladmir',
+    pipe_of_insight: 'pipe'
+  };
+
+  const iconName = iconNameMap[item.id] || item.id;
+  const iconUrl = `${CDN_BASE}${iconName}_lg.png`;
+  
+  return `<img src="${iconUrl}" alt="${item.name}" loading="lazy" onerror="this.onerror=null;this.parentElement.textContent='${getFallbackEmoji(item)}'">`;
+}
+
+function getFallbackEmoji(item) {
+  // Fallback emoji when CDN image fails to load
   const statIconMap = {
     damage: "\u2694\uFE0F",
     mana: "\u{1F4A7}",
@@ -1562,7 +1607,6 @@ function getItemIconHTML(item) {
     return statIconMap[bestStat];
   }
 
-  // Fallback for items with no stats (consumables, utilities)
   if (item.tags.includes("consumable")) return "\u{1F3F7}\uFE0F";
   if (item.tags.includes("boots")) return "\u{1F97E}";
   if (item.tags.includes("support")) return "\u{1F9F8}";
